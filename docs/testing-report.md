@@ -17,4 +17,4 @@
 
 ## Verification pending external environment
 
-Render PostgreSQL, backend, and frontend deployment remains external and requires Render account access and credentials. Loom and Google Drive public sharing require manual account authorization.
+Supabase production connectivity/migrations remain pending password rotation; the previously pasted password is considered compromised. Render backend/frontend deployment and production CRUD checks require account access and configuration. Loom and Google Drive public sharing require manual account authorization.

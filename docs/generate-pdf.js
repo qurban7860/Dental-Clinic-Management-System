@@ -44,9 +44,9 @@ for (const [title, file] of [
   }
 }
 
-section("Deployment", "render.yaml defines the PostgreSQL database, backend web service, and frontend static site. Public Render URLs, API health verification, and deployed CRUD operations remain external because account credentials are not available.");
+section("Deployment", "Supabase PostgreSQL is configured as the production database provider. The backend accepts its rotated session-pooler URL through DATABASE_URL; Render configuration marks this as a manually supplied secret and does not create another database. Apply migrations with npx prisma migrate deploy after configuring the rotated credential. Render URLs and deployed CRUD checks remain pending account access.");
 section("Repository and deliverables", "Repository: https://github.com/qurban7860/Dental-Clinic-Management-System\nDevelop branch and source code are maintained in this repository.\nREADME, architecture, API, database design, testing report, and traceability files are included in /docs.");
 section("Loom and Google Drive", "Loom URL: LOOM_URL_TO_BE_ADDED\nGoogle Drive public sharing has not been performed. Upload this PDF, docs/architecture.md, docs/api-documentation.md, docs/database-design.md, docs/testing-report.md, docs/requirement-traceability.md, and docs/screenshots/*.png to a public-viewer submission folder.");
-section("Limitations", "No authentication is implemented. Loom and Google Drive deliverables require manual recording/upload authorization. Production deployment requires Render account access and credentials.");
+section("Limitations", "No authentication is implemented. The pasted Supabase password must be rotated before use. Loom and Google Drive deliverables require manual sharing authorization. Render deployment requires account access.");
 
 doc.end();

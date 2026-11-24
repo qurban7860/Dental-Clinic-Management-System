@@ -68,6 +68,25 @@ npm run seed
 npm run dev
 ```
 
+## Supabase PostgreSQL production setup
+
+The Supabase password pasted into the terminal/chat should be considered compromised. **Rotate the database password in Supabase before connecting**; do not reuse or paste the replacement into chat, source code, or a terminal command. In the Supabase dashboard, open **Project Settings → Database** and reset the database password. Copy the new connection string from **Connect → Session pooler** (port `5432`) or use the direct connection when your host supports it. Reserved password characters must be percent-encoded (`@` becomes `%40`).
+
+From PowerShell:
+
+```powershell
+Set-Location C:\Users\qurba\OneDrive\Desktop\Dental-Clinic-Management-System\server
+.\scripts\set-supabase-url.ps1
+npx prisma validate
+npx prisma generate
+npx prisma migrate status
+npx prisma migrate deploy
+```
+
+The script asks for the rotated URL using hidden input, validates the Supabase host and port, adds `sslmode=require` if missing, and stores the value in ignored `server/.env`. It never displays the URL. Do not run `npm run seed` against production unless you explicitly want fictional sample records there.
+
+For Render, set the same rotated Supabase URL as the `DATABASE_URL` secret in the backend service's Environment settings before its first deployment. The checked-in `render.yaml` marks it as an unsynced secret and does not provision a Render database. Set `CLIENT_URL` to the exact frontend origin and `VITE_API_URL` to the deployed API base. Never set `DATABASE_URL` in the frontend.
+
 ## Database seed
 
 The seed adds six fictional doctors and 18 fictional appointments across active, upcoming, today, pending, completed, and cancelled states. It is idempotent for doctors and does not delete existing production data. Run it only with an explicitly configured database:
@@ -88,15 +107,15 @@ npm run seed -w server
 
 ## Production
 
-`render.yaml` provisions a Render PostgreSQL database, Express web service, and static React site. Set `CLIENT_URL` and `VITE_API_URL` in Render. The API migration command is `npx prisma migrate deploy`; destructive reset commands are never used.
+`render.yaml` configures the Express web service and static React site. Production PostgreSQL is Supabase; configure its rotated connection URI as the backend-only `DATABASE_URL` secret in Render. The API migration command is `npx prisma migrate deploy`; destructive reset commands are never used.
 
 ## Render deployment
 
-1. In the Render dashboard, create the PostgreSQL database from `render.yaml` or manually.
+1. Rotate the Supabase database password and set the new connection URI as the backend-only `DATABASE_URL` secret in Render.
 2. Create a Web Service for `server`, selecting the `develop` branch.
 3. Set build command to `npm install && npx prisma generate && npx prisma migrate deploy`.
 4. Set start command to `npm start`.
-5. Set `DATABASE_URL` from the Render PostgreSQL internal connection string.
+5. Set `DATABASE_URL` to the Supabase session-pooler URI (port 5432), with reserved password characters percent-encoded and TLS enabled.
 6. Set `NODE_ENV=production` and `CLIENT_URL` to the exact Render static-site origin.
 7. Create a Static Site for `client`, branch `develop`, build command `npm install && npm run build`, publish directory `dist`, and SPA rewrite `/* -> /index.html`.
 8. Set `VITE_API_URL` to `https://YOUR-BACKEND.onrender.com/api`.
