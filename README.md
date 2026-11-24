@@ -19,6 +19,13 @@ A responsive, database-backed dental clinic administration application built wit
 - Zod validation
 - Vitest, React Testing Library, Supertest
 
+## Separate repositories
+
+- Frontend: https://github.com/qurban7860/dental-clinic-web
+- Backend: https://github.com/qurban7860/dental-clinic-api
+
+The original combined repository remains available at https://github.com/qurban7860/Dental-Clinic-Management-System.
+
 ## Local setup
 
 1. Install Node.js 20 or newer.
