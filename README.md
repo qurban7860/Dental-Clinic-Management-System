@@ -26,12 +26,21 @@ A responsive, database-backed dental clinic administration application built wit
 
 The original combined repository remains available at https://github.com/qurban7860/Dental-Clinic-Management-System.
 
+## Production deployments
+
+- Frontend: [https://dental-clinic-web-nine.vercel.app/](https://dental-clinic-web-nine.vercel.app/)
+- API deployment: [https://dental-clinic-api-opal.vercel.app/](https://dental-clinic-api-opal.vercel.app/)
+- API base path: [https://dental-clinic-api-opal.vercel.app/api](https://dental-clinic-api-opal.vercel.app/api)
+- API health: [https://dental-clinic-api-opal.vercel.app/api/health](https://dental-clinic-api-opal.vercel.app/api/health)
+
+The health endpoint verifies API and database connectivity; it does not replace end-to-end testing of production workflows. The application does not implement authentication or authorization. Do not use it to store real patient information or protected health information.
+
 ## Local setup
 
 1. Install Node.js 20 or newer.
 2. Copy `.env.example` to `server/.env` and set `DATABASE_URL`.
 3. Run `npm install`.
-4. Run `npm run migrate:dev -w server` or `npx prisma migrate deploy -w server`.
+4. Run `npm run migrate:dev -w server` or `npm run migrate -w server`.
 5. Run `npm run seed -w server`.
 6. Run `npm run dev`.
 
@@ -75,9 +84,9 @@ npm run seed
 npm run dev
 ```
 
-## Supabase PostgreSQL production setup
+## Supabase PostgreSQL setup
 
-The Supabase password pasted into the terminal/chat should be considered compromised. **Rotate the database password in Supabase before connecting**; do not reuse or paste the replacement into chat, source code, or a terminal command. In the Supabase dashboard, open **Project Settings → Database** and reset the database password. Copy the new connection string from **Connect → Session pooler** (port `5432`) or use the direct connection when your host supports it. Reserved password characters must be percent-encoded (`@` becomes `%40`).
+Treat previously exposed Supabase database credentials as compromised. **Rotate the database password in Supabase before relying on it**; do not reuse or paste the replacement into chat, source code, or a terminal command. In the Supabase dashboard, open **Project Settings → Database** and reset the database password. Copy the new connection string from **Connect → Session pooler** (port `5432`) or use the direct connection when your host supports it. Reserved password characters must be percent-encoded (`@` becomes `%40`).
 
 From PowerShell:
 
@@ -93,7 +102,7 @@ npx prisma migrate deploy
 
 The process-scoped policy change lasts only for this PowerShell window; it does not change the machine or user policy. The script asks for the rotated URL using hidden input, validates the Supabase host and port, adds `sslmode=require` if missing, and stores the value in ignored `server/.env`. It never displays the URL. Do not run `npm run seed` against production unless you explicitly want fictional sample records there.
 
-For Render, set the same rotated Supabase URL as the `DATABASE_URL` secret in the backend service's Environment settings before its first deployment. The checked-in `render.yaml` marks it as an unsynced secret and does not provision a Render database. Set `CLIENT_URL` to the exact frontend origin and `VITE_API_URL` to the deployed API base. Never set `DATABASE_URL` in the frontend.
+For the Vercel API project, set the rotated URL as the Production `DATABASE_URL` environment variable. Set `CLIENT_URL` to `https://dental-clinic-web-nine.vercel.app`. The frontend uses `VITE_API_URL=https://dental-clinic-api-opal.vercel.app/api`; never set `DATABASE_URL` in the frontend. Run production migrations from a trusted environment with the rotated URL configured, and do not run production migrations from Preview deployments.
 
 ## Database seed
 
@@ -115,19 +124,17 @@ npm run seed -w server
 
 ## Production
 
-`render.yaml` configures the Express web service and static React site. Production PostgreSQL is Supabase; configure its rotated connection URI as the backend-only `DATABASE_URL` secret in Render. The API migration command is `npx prisma migrate deploy`; destructive reset commands are never used.
+The live frontend and API are deployed on Vercel and use Supabase PostgreSQL. The health endpoint is available at `https://dental-clinic-api-opal.vercel.app/api/health`. Keep `DATABASE_URL` in the backend project's encrypted environment settings only. Apply schema changes with `npx prisma migrate deploy` after confirming the target database and rotated credential; do not use destructive reset commands against production.
 
-## Render deployment
+## Alternative hosting: Render
 
-1. Rotate the Supabase database password and set the new connection URI as the backend-only `DATABASE_URL` secret in Render.
-2. Create a Web Service for `server`, selecting the `develop` branch.
-3. Set build command to `npm install && npx prisma generate && npx prisma migrate deploy`.
-4. Set start command to `npm start`.
-5. Set `DATABASE_URL` to the Supabase session-pooler URI (port 5432), with reserved password characters percent-encoded and TLS enabled.
-6. Set `NODE_ENV=production` and `CLIENT_URL` to the exact Render static-site origin.
-7. Create a Static Site for `client`, branch `develop`, build command `npm install && npm run build`, publish directory `dist`, and SPA rewrite `/* -> /index.html`.
-8. Set `VITE_API_URL` to `https://YOUR-BACKEND.onrender.com/api`.
-9. Verify `/api/health`, create/edit/delete records through the deployed UI, refresh routes, and inspect Render logs.
+Render is an optional alternative; Vercel is the current production host.
+
+1. Import the `server` and `client` directories as separate services.
+2. Set the backend build command to `npm install && npx prisma generate` and start command to `npm start`.
+3. Configure the rotated `DATABASE_URL` secret and exact `CLIENT_URL` in the backend service; configure `VITE_API_URL` in the frontend service.
+4. Run `npx prisma migrate deploy` as a controlled release step before routing production traffic. Do not run migrations as part of the build or from Preview deployments against the production database.
+5. Verify the API health endpoint, exercise authorized smoke tests, refresh frontend routes, and inspect service logs.
 
 ## Testing
 
@@ -141,4 +148,4 @@ Frontend and backend suites cover navigation, dashboard rendering, empty states,
 
 ## Security and limitations
 
-The system has no authentication and must not be presented as access-controlled. It uses fictional demonstration data. Appointment timestamps are consistently stored in UTC and the UI displays UTC-normalized values. Production PostgreSQL enforcement is application-transaction based; a database exclusion constraint can be added for additional concurrent protection.
+The system has no authentication or authorization and must not be presented as access-controlled. Do not store real patient information or protected health information. It uses fictional demonstration data. Appointment timestamps are consistently stored in UTC and the UI displays UTC-normalized values. Production PostgreSQL enforcement is application-transaction based; a database exclusion constraint can be added for additional concurrent protection.

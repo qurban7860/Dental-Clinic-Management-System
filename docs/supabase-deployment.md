@@ -25,10 +25,14 @@ The process-scoped execution policy lasts only for this PowerShell window and do
 
 Confirm the applied migration using `npx prisma migrate status`, then start the server and verify `GET /api/health`. Only health verification confirms the running API can connect to the configured database.
 
-## Render configuration
+## Vercel production configuration
 
-The backend service in `render.yaml` expects `DATABASE_URL` to be configured manually as an unsynced secret. Add the rotated Supabase connection URL in Render's backend Environment settings, along with `NODE_ENV=production` and the exact `CLIENT_URL`. Render applies Prisma migrations during the backend build using `npx prisma migrate deploy`.
+The production frontend is [https://dental-clinic-web-nine.vercel.app/](https://dental-clinic-web-nine.vercel.app/). The API deployment is [https://dental-clinic-api-opal.vercel.app/](https://dental-clinic-api-opal.vercel.app/), with routes under [https://dental-clinic-api-opal.vercel.app/api](https://dental-clinic-api-opal.vercel.app/api). Its health check is [https://dental-clinic-api-opal.vercel.app/api/health](https://dental-clinic-api-opal.vercel.app/api/health).
 
-The static frontend only needs `VITE_API_URL=https://YOUR-API-HOST/api`. Do not add the database URL to frontend environment variables.
+Configure the rotated Supabase connection URL as the backend Vercel project's Production `DATABASE_URL` secret. Set `CLIENT_URL` to the exact frontend origin, `https://dental-clinic-web-nine.vercel.app`. The frontend uses `VITE_API_URL=https://dental-clinic-api-opal.vercel.app/api`; do not add the database URL to frontend environment variables.
+
+Apply migrations from a trusted shell with the rotated database URL configured. Do not run migrations for Preview deployments against the production database. Confirm `npx prisma migrate status`, apply pending migrations with `npx prisma migrate deploy`, and verify the production health endpoint before release. Health confirms connectivity only; perform separate production smoke tests for application workflows.
+
+The API currently has no authentication or authorization. Do not use it to store real patient information or protected health information.
 
 Do not seed the production database automatically. If fictional sample records are wanted, run the seed script once only after confirming the target project and reviewing the seed behavior.

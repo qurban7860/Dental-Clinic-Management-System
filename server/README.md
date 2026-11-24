@@ -4,6 +4,15 @@ Standalone Express/Prisma API for the Dental Clinic Management System.
 
 Repository: https://github.com/qurban7860/dental-clinic-api
 
+## Production
+
+- API deployment: [https://dental-clinic-api-opal.vercel.app/](https://dental-clinic-api-opal.vercel.app/)
+- API base path: [https://dental-clinic-api-opal.vercel.app/api](https://dental-clinic-api-opal.vercel.app/api)
+- Health check: [https://dental-clinic-api-opal.vercel.app/api/health](https://dental-clinic-api-opal.vercel.app/api/health)
+- Frontend origin: [https://dental-clinic-web-nine.vercel.app/](https://dental-clinic-web-nine.vercel.app/)
+
+The health endpoint currently reports a successful database connection. It is a connectivity check, not a substitute for production CRUD and workflow smoke tests.
+
 ## Local setup
 
 ```powershell
@@ -36,10 +45,21 @@ Do not run the seed script against production unless fictional demo data is expl
 npm test
 ```
 
-## Render
+## Vercel production deployment
 
-The included `render.yaml` deploys the Node service. Add `DATABASE_URL` and `CLIENT_URL` in the Render service Environment settings. The build runs Prisma Client generation and `prisma migrate deploy`; frontend URL must be the exact allowed origin.
+The production API is deployed on Vercel. Import this repository with its root as the Vercel project root. Vercel's Express runtime serves the exported app in `src/app.js`; routes remain under `/api`.
 
-## Vercel
+Configure these values in the API project's Production environment:
 
-Import this repository into Vercel with the repository root as the project root. Vercel's Express runtime serves the exported app in `src/app.js`; routes remain under `/api`. Configure `DATABASE_URL` with the rotated Supabase connection URL and `CLIENT_URL` with the exact deployed frontend origin in Vercel Environment Variables. Run `npx prisma migrate deploy` from a trusted local shell after setting the rotated database URL, before directing production traffic. Do not run migrations for Preview deployments against the production database.
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Rotated Supabase PostgreSQL connection URI; store as a secret in the API project only |
+| `CLIENT_URL` | Exact frontend origin: `https://dental-clinic-web-nine.vercel.app` |
+
+Rotate any database password previously exposed in chat, files, or logs before using it. Use TLS and a Supabase session-pooler connection on port `5432` for Prisma migrations. Apply migrations from a trusted shell with the rotated URL configured using `npx prisma migrate deploy`; do not run migrations for Preview deployments against the production database. After deployment, verify `GET /api/health` and run authorized smoke tests before relying on the service.
+
+The application does not implement authentication or authorization. Do not use it to store real patient information or protected health information.
+
+## Alternative hosting: Render
+
+The included `render.yaml` deploys the Node service. Add `DATABASE_URL` and `CLIENT_URL` in the Render service Environment settings. The build generates Prisma Client; apply migrations separately as a controlled release step before routing production traffic.

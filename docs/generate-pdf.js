@@ -6,11 +6,18 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const output = path.join(__dirname, "..", "Dental-Clinic-Management-System-Documentation.pdf");
 const doc = new PDFDocument({ margin: 48 });
+doc.info = {
+  Title: "Dental Clinic Management System - Project and Deployment Documentation",
+  Author: "Dental Clinic Management System",
+  Subject: "Application architecture, verification, and production deployment",
+  Keywords: "dental clinic, React, Express, PostgreSQL, Prisma, Vercel",
+  CreationDate: new Date(),
+};
 doc.pipe(fs.createWriteStream(output));
 
 doc.fontSize(22).fillColor("#173f50").text("Dental Clinic Management System", { align: "center" });
 doc.moveDown();
-doc.fontSize(12).fillColor("#18313d").text("Production-quality full-stack documentation", { align: "center" });
+doc.fontSize(12).fillColor("#18313d").text("Project and deployment documentation", { align: "center" });
 doc.moveDown(2);
 
 function section(title, text) {
@@ -44,9 +51,28 @@ for (const [title, file] of [
   }
 }
 
-section("Deployment", "Supabase PostgreSQL is configured as the production database provider. The backend accepts its rotated session-pooler URL through DATABASE_URL; Render configuration marks this as a manually supplied secret and does not create another database. Apply migrations with npx prisma migrate deploy after configuring the rotated credential. Render URLs and deployed CRUD checks remain pending account access.");
+doc.addPage();
+doc.fontSize(17).fillColor("#1877a7").text("Production deployments");
+doc.moveDown();
+doc.fontSize(10).fillColor("#18313d").text(
+  "Frontend: https://dental-clinic-web-nine.vercel.app/",
+  { link: "https://dental-clinic-web-nine.vercel.app/", underline: true }
+);
+doc.text(
+  "API deployment: https://dental-clinic-api-opal.vercel.app/",
+  { link: "https://dental-clinic-api-opal.vercel.app/", underline: true }
+);
+doc.text(
+  "API base path: https://dental-clinic-api-opal.vercel.app/api",
+  { link: "https://dental-clinic-api-opal.vercel.app/api", underline: true }
+);
+doc.text(
+  "API health: https://dental-clinic-api-opal.vercel.app/api/health",
+  { link: "https://dental-clinic-api-opal.vercel.app/api/health", underline: true }
+);
+doc.moveDown();
+doc.fillColor("#18313d").text("The latest health check returned HTTP 200 and reported a connected database. Production CRUD and end-to-end workflows have not been independently verified. Keep DATABASE_URL in the backend project's secret environment settings only; never expose it in the frontend build.");
 section("Repository and deliverables", "Repository: https://github.com/qurban7860/Dental-Clinic-Management-System\nDevelop branch and source code are maintained in this repository.\nREADME, architecture, API, database design, testing report, and traceability files are included in /docs.");
-section("Loom and Google Drive", "Loom URL: LOOM_URL_TO_BE_ADDED\nGoogle Drive public sharing has not been performed. Upload this PDF, docs/architecture.md, docs/api-documentation.md, docs/database-design.md, docs/testing-report.md, docs/requirement-traceability.md, and docs/screenshots/*.png to a public-viewer submission folder.");
-section("Limitations", "No authentication is implemented. The pasted Supabase password must be rotated before use. Loom and Google Drive deliverables require manual sharing authorization. Render deployment requires account access.");
+section("Security and limitations", "The application has no authentication or authorization and must not be used to store real patient information or protected health information. Rotate any previously exposed Supabase database password and replace the backend DATABASE_URL secret before relying on it. Production CRUD and end-to-end workflows have not been independently verified.");
 
 doc.end();

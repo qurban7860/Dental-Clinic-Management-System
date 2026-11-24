@@ -13,6 +13,6 @@
 | B1 | Central error and validation | Zod and error middleware | Supertest suite | Implemented | TESTED |
 | U1 | Responsive/accessibility | Shared layout, CSS, semantic controls | Frontend tests | Implemented | TESTED |
 | T1 | Automated testing | Vitest, RTL, Supertest, Playwright config | Local suites | Implemented | TESTED |
-| P2 | Render configuration | `render.yaml` | External account unavailable | Config prepared | BLOCKED |
+| P2 | Production deployment | Vercel frontend/API deployment | Live frontend check and `GET /api/health` | Frontend serves; API health reports database connected; production CRUD not verified | PARTIAL |
 | O1 | PDF and documentation | `docs/*.md`, README | Manual | Documentation complete | TESTED |
 | O2 | Loom and Google Drive | Placeholder and submission instructions | External authorization required | Not uploaded | BLOCKED |

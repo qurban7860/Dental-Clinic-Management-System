@@ -15,6 +15,10 @@
 - Unit/integration: backend 5/5 passed; frontend 3/3 passed
 - Production build: passed
 
-## Verification pending external environment
+## Production deployment checks
 
-Supabase production connectivity/migrations remain pending password rotation; the previously pasted password is considered compromised. Render backend/frontend deployment and production CRUD checks require account access and configuration. Loom and Google Drive public sharing require manual account authorization.
+- Frontend: deployed and serving at https://dental-clinic-web-nine.vercel.app/
+- API: deployed at https://dental-clinic-api-opal.vercel.app/
+- API health: `GET /api/health` returned HTTP 200 and reported `database: connected` during the latest check
+- Production CRUD and end-to-end workflows: not independently verified
+- Security: rotate any previously exposed Supabase database password and replace the backend's `DATABASE_URL` secret before relying on it. The app has no authentication; do not use real patient information.
