@@ -76,6 +76,7 @@ From PowerShell:
 
 ```powershell
 Set-Location C:\Users\qurba\OneDrive\Desktop\Dental-Clinic-Management-System\server
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 .\scripts\set-supabase-url.ps1
 npx prisma validate
 npx prisma generate
@@ -83,7 +84,7 @@ npx prisma migrate status
 npx prisma migrate deploy
 ```
 
-The script asks for the rotated URL using hidden input, validates the Supabase host and port, adds `sslmode=require` if missing, and stores the value in ignored `server/.env`. It never displays the URL. Do not run `npm run seed` against production unless you explicitly want fictional sample records there.
+The process-scoped policy change lasts only for this PowerShell window; it does not change the machine or user policy. The script asks for the rotated URL using hidden input, validates the Supabase host and port, adds `sslmode=require` if missing, and stores the value in ignored `server/.env`. It never displays the URL. Do not run `npm run seed` against production unless you explicitly want fictional sample records there.
 
 For Render, set the same rotated Supabase URL as the `DATABASE_URL` secret in the backend service's Environment settings before its first deployment. The checked-in `render.yaml` marks it as an unsynced secret and does not provision a Render database. Set `CLIENT_URL` to the exact frontend origin and `VITE_API_URL` to the deployed API base. Never set `DATABASE_URL` in the frontend.
 

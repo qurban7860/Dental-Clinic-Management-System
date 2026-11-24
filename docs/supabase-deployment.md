@@ -13,6 +13,7 @@ If a database password has been pasted into a chat, source file, or command, tre
 
 ```powershell
 Set-Location C:\Users\qurba\OneDrive\Desktop\Dental-Clinic-Management-System\server
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 .\scripts\set-supabase-url.ps1
 npx prisma validate
 npx prisma generate
@@ -20,7 +21,7 @@ npx prisma migrate status
 npx prisma migrate deploy
 ```
 
-The script takes the connection URL through hidden PowerShell input and stores it in the ignored `server/.env`. It only accepts Supabase hosts on port 5432 and enforces TLS with `sslmode=require`. It does not seed the database.
+The process-scoped execution policy lasts only for this PowerShell window and does not change machine/user policy. The script takes the connection URL through hidden PowerShell input and stores it in the ignored `server/.env`. It only accepts Supabase hosts on port 5432 and enforces TLS with `sslmode=require`. It does not seed the database.
 
 Confirm the applied migration using `npx prisma migrate status`, then start the server and verify `GET /api/health`. Only health verification confirms the running API can connect to the configured database.
 
