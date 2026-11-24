@@ -1,0 +1,17 @@
+{
+  "name": "dental-clinic-management-system",
+  "type": "module",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c blue,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "test": "npm run test -w server && npm run test -w client",
+    "start": "npm run start -w server",
+    "docs:pdf": "node docs/generate-pdf.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "pdfkit": "^0.17.2"
+  }
+}
