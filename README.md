@@ -30,6 +30,44 @@ A responsive, database-backed dental clinic administration application built wit
 
 The frontend runs at `http://localhost:5173`; the API runs at `http://localhost:5000/api`.
 
+## Native Windows PostgreSQL setup
+
+PostgreSQL can be installed with `winget`:
+
+```powershell
+winget install --id PostgreSQL.PostgreSQL.17 --exact --silent --accept-package-agreements --accept-source-agreements
+Get-Service postgresql-x64-17
+Get-Command psql
+```
+
+Create a dedicated database role and database in PowerShell. Replace the password placeholder only in a private `server/.env` file:
+
+```powershell
+$env:PGPASSWORD='YOUR_POSTGRES_ADMIN_PASSWORD'
+& 'C:\Program Files\PostgreSQL\17\bin\psql.exe' -h localhost -U postgres -d postgres -c "CREATE ROLE dental_app LOGIN PASSWORD 'YOUR_PRIVATE_APP_PASSWORD';"
+& 'C:\Program Files\PostgreSQL\17\bin\psql.exe' -h localhost -U postgres -d postgres -c "CREATE DATABASE dental_clinic OWNER dental_app;"
+```
+
+Create `server/.env`:
+
+```dotenv
+DATABASE_URL=postgresql://dental_app:YOUR_PRIVATE_APP_PASSWORD@localhost:5432/dental_clinic?schema=public
+PORT=5000
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173,http://127.0.0.1:5173
+```
+
+Then:
+
+```powershell
+Set-Location server
+npx prisma validate
+npx prisma generate
+npx prisma migrate deploy
+npm run seed
+npm run dev
+```
+
 ## Database seed
 
 The seed adds six fictional doctors and 18 fictional appointments across active, upcoming, today, pending, completed, and cancelled states. It is idempotent for doctors and does not delete existing production data. Run it only with an explicitly configured database:
@@ -51,6 +89,18 @@ npm run seed -w server
 ## Production
 
 `render.yaml` provisions a Render PostgreSQL database, Express web service, and static React site. Set `CLIENT_URL` and `VITE_API_URL` in Render. The API migration command is `npx prisma migrate deploy`; destructive reset commands are never used.
+
+## Render deployment
+
+1. In the Render dashboard, create the PostgreSQL database from `render.yaml` or manually.
+2. Create a Web Service for `server`, selecting the `develop` branch.
+3. Set build command to `npm install && npx prisma generate && npx prisma migrate deploy`.
+4. Set start command to `npm start`.
+5. Set `DATABASE_URL` from the Render PostgreSQL internal connection string.
+6. Set `NODE_ENV=production` and `CLIENT_URL` to the exact Render static-site origin.
+7. Create a Static Site for `client`, branch `develop`, build command `npm install && npm run build`, publish directory `dist`, and SPA rewrite `/* -> /index.html`.
+8. Set `VITE_API_URL` to `https://YOUR-BACKEND.onrender.com/api`.
+9. Verify `/api/health`, create/edit/delete records through the deployed UI, refresh routes, and inspect Render logs.
 
 ## Testing
 

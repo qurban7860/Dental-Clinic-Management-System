@@ -6,7 +6,15 @@
 - Frontend Vitest/React Testing Library: dashboard metrics, doctors empty state, unknown routes
 - Production build: successful Vite build
 - Prisma: client generation successful
+- Local PostgreSQL: PostgreSQL 17 native Windows installation, dedicated database and application role
+- Prisma migration: `20261124000000_init` applied successfully
+- Database seed: 6 doctors and 18 appointments; rerun produced no duplicate appointments
+- API health: database-connected response returned 200
+- Real CRUD verification: doctor create/update/delete passed, appointment create/update/delete passed, overlap was rejected
+- Playwright Chromium: 3/3 tests passed covering routes, doctor CRUD, and appointment CRUD
+- Unit/integration: backend 5/5 passed; frontend 3/3 passed
+- Production build: passed
 
 ## Verification pending external environment
 
-Live PostgreSQL and Render deployment require credentials/account access. Browser E2E and deployed CRUD verification cannot be honestly claimed until external services are available.
+Render PostgreSQL, backend, and frontend deployment remains external and requires Render account access and credentials. Loom and Google Drive public sharing require manual account authorization.

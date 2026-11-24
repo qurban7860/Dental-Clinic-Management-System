@@ -7,6 +7,7 @@
     "dev": "concurrently -n API,WEB -c blue,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w client",
     "test": "npm run test -w server && npm run test -w client",
+    "e2e": "npx playwright test -c client/playwright.config.js",
     "start": "npm run start -w server",
     "docs:pdf": "node docs/generate-pdf.js"
   },
